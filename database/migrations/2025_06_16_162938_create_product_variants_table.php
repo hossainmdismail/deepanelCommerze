@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->integer('stock');
             $table->string('image')->nullable();
+            $table->json('attribute_snapshot')->nullable();
             $table->timestamps();
         });
     }

@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('attribute_values', function (Blueprint $table) {
             $table->id();
             $table->foreignId('attribute_id')->constrained()->onDelete('cascade');
-            $table->string('value');
+            $table->string('value'); // the actual value (like "Red" or "L")
+            $table->string('slug')->unique();
+            $table->string('meta')->nullable();
+            // optional: can be color code (#FF0000) or image URL etc, depending on type
             $table->timestamps();
         });
     }

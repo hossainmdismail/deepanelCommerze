@@ -10,20 +10,37 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Str;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Set;
 
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Product';
+    protected static ?int $navigationSort = 3;
+
 
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\TextInput::make('name')->required(),
-            Forms\Components\TextInput::make('slug')->required(),
+            TextInput::make('name')
+                ->required()
+                ->maxLength(255)
+                ->live(onBlur: true)
+                ->afterStateUpdated(function (string $operation, $state, Set $set) {
+                    $set('slug', Str::slug($state)); // applies for both create and update
+                }),
+
+            TextInput::make('slug')
+                // ->disabled(fn(string $operation) => $operation === 'edit') // disable only on edit
+                ->dehydrated()
+                ->required()
+                ->maxLength(255)
+                ->unique(\App\Models\Category::class, 'slug', ignoreRecord: true),
+
             Forms\Components\Select::make('parent_id')
                 ->relationship('parent', 'name')
                 ->searchable()

@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('attributes', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('slug')->unique();
+            $table->string('slug')->nullable()->unique();
+            $table->string('type')->default('text'); // text, color, image (for UI rendering)
+            $table->integer('sort_order')->default(0); // for custom display order
+            $table->boolean('is_enabled')->default(true); // easy toggle
             $table->timestamps();
         });
     }

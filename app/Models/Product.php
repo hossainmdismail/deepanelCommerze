@@ -17,59 +17,50 @@ class Product extends Model
         'is_variant_based',
         'stock',
         'status',
-        'thumbnail'
+        'thumbnail',
     ];
 
     protected $casts = [
         'is_variant_based' => 'boolean',
     ];
 
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
+
+    // Product has many variants
     public function variants(): HasMany
     {
         return $this->hasMany(ProductVariant::class);
     }
 
-    public function categories(): BelongsToMany
+    // Optional: get all attribute values used in any variant of this product (via pivot)
+    public function attributeValues()
     {
-        return $this->belongsToMany(Category::class);
+        return $this->hasManyThrough(
+            AttributeValue::class,
+            ProductVariantAttributeValue::class,
+            'product_variant_id', // Foreign key on pivot table
+            'id',                 // Foreign key on AttributeValue table
+            'id',                 // Local key on Product table
+            'attribute_value_id'  // Local key on pivot table
+        );
     }
 
-    public function images(): HasMany
+    // Helper for total stock (sum of variant stocks if variant based)
+    public function getTotalStockAttribute()
     {
-        return $this->hasMany(ProductImage::class);
+        return $this->is_variant_based
+            ? $this->variants()->sum('stock')
+            : $this->stock;
     }
 
-    public function seo(): HasOne
+    // Helper for effective price (first variant price or base price)
+    public function getEffectivePriceAttribute()
     {
-        return $this->hasOne(ProductSeo::class);
-    }
-
-    public function cartItems(): HasMany
-    {
-        return $this->hasMany(CartItem::class);
-    }
-
-    public function orderItems(): HasMany
-    {
-        return $this->hasMany(OrderItem::class);
-    }
-
-    // public function attributes(): HasManyThrough
-    // {
-    //     return $this->hasManyThrough(
-    //         Attribute::class,
-    //         ProductVariantAttributeValue::class,
-    //         'product_variant_id',
-    //         'id',
-    //         'id',
-    //         'attribute_id'
-    //     )->distinct();
-    // }
-    // In ProductVariant model
-    public function attributes(): BelongsToMany
-    {
-        return $this->belongsToMany(Attribute::class, 'product_variant_attribute_value')
-            ->withPivot('attribute_value_id')
-            ->using(ProductVariantAttribute::class); // Only if you created the custom pivot model
+        return $this->is_variant_based
+            ? optional($this->variants()->first())->price
+            : $this->base_price;
     }
 }

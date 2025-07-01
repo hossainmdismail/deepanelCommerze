@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ProductVariant extends Model
 {
@@ -14,27 +13,40 @@ class ProductVariant extends Model
         'sku',
         'price',
         'stock',
-        'image'
+        'image',
+        'attribute_snapshot',
     ];
+
+    protected $casts = [
+        'attribute_snapshot' => 'array',
+    ];
+
 
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    public function attributeValues(): BelongsToMany
-    {
-        return $this->belongsToMany(AttributeValue::class, 'product_variant_attribute_value')
-            ->withPivot('attribute_id');
-    }
+    // Pivot relation: variant has many attribute values, with attribute_id pivot
+public function attributeValues()
+{
+    return $this->belongsToMany(
+        \App\Models\AttributeValue::class,
+        'product_variant_attribute_values',
+        'product_variant_id',
+        'attribute_value_id'
+    )->withPivot('attribute_id');
+}
 
-    public function cartItems(): HasMany
-    {
-        return $this->hasMany(CartItem::class);
-    }
 
-    public function orderItems(): HasMany
+
+    // Sync attributes from form input
+    public function saveAttributes(array $attributesData)
     {
-        return $this->hasMany(OrderItem::class);
+        $syncData = [];
+        foreach ($attributesData as $attr) {
+            $syncData[$attr['attribute_value_id']] = ['attribute_id' => $attr['attribute_id']];
+        }
+        $this->attributeValues()->sync($syncData);
     }
 }

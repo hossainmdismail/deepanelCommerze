@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Attribute extends Model
 {
-    protected $fillable = ['name', 'slug'];
+    protected $fillable = ['name', 'type'];
 
     public function values(): HasMany
     {
