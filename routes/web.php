@@ -13,3 +13,4 @@ Route::get('/product/{slug}',[ProductFrontController::class, 'product'])->name('
 Route::post('/add-to-cart',[ProductFrontController::class, 'cart'])->name('add.to.cart');
 Route::get('/cart', [ProductFrontController::class, 'cartShow'])->name('cart.show');
 Route::post('/checkout',[OrderController::class, 'checkout'])->name('checkout');
+Route::get('/thankyou/{orderId}',[OrderController::class, 'thankyou'])->name('thankyou');

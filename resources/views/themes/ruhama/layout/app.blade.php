@@ -20,7 +20,8 @@
     <meta name="keywords"
         content="Ruhama BD, খাঁটি মধু, প্রাকৃতিক তেল, গাওয়া ঘি, বাংলাদেশী মধু, অর্গানিক পণ্য, বিহানি প্রোডাক্টস" />
     <!-- favicon -->
-    <link rel="icon" type="image/png" sizes="128x128" href="{{ asset('themes/ruhama') }}/img/Ruhamaaa/Ruhamaa logo.jpg" />
+    <link rel="icon" type="image/png" sizes="128x128"
+        href="{{ asset('themes/ruhama') }}/img/Ruhamaaa/Ruhamaa logo.jpg" />
     <!-- google font -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap" rel="stylesheet" />
@@ -43,6 +44,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/gh/fonts-bd/muktinarrow/muktinarrow.css" rel="stylesheet" />
     <meta name="google-site-verification" content="cebUO59YsYhT0U-or3YCrKqb_RjsSRM-6RKACcAWQ5c" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
 
     <script type="text/javascript">
         var Tawk_API = Tawk_API || {},
@@ -115,8 +117,7 @@
     </script>
 
     <!-- Scroll Top -->
-    <a href="#" id="scroll-top"
-        class="scroll-top d-flex align-items-center justify-content-center ScrollerTop">
+    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center ScrollerTop">
         <i class="fas fa-arrow-up"></i>
     </a>
 
@@ -151,6 +152,7 @@
         });
     </script>
 
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     <!-- jquery -->
     <script src="{{ asset('themes/ruhama/js/blade.js') }}"></script>
     <script src="{{ asset('themes/ruhama') }}/js/jquery-1.11.3.min.js"></script>
@@ -173,6 +175,7 @@
     <!-- main js -->
     <script src="{{ asset('themes/ruhama') }}/js/main.js"></script>
 
+    @include('themes.ruhama.layout.alert')
     @yield('script')
 </body>
 

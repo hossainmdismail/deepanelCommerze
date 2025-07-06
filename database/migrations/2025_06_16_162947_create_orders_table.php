@@ -13,16 +13,44 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('order_id');
+            $table->foreignId('customer_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
-            $table->enum('status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'])->default('pending');
+            $table->enum('status', [
+                'pending',
+                'processing',
+                'shipped',
+                'delivered',
+                'cancelled',
+                'refunded'
+            ])->default('pending');
+
             $table->string('coupon_code')->nullable();
-            $table->decimal('discount_amount', 10,2)->default(0);
+            $table->decimal('discount_amount', 10, 2)->default(0);
             $table->decimal('total_amount', 10, 2);
-            $table->string('order_notes')->nullable();
-            $table->string('shipping_method');
-            $table->decimal('shipping_fee',10,2)->default(0);
+
+            $table->string('shipping_method')->nullable();
+            $table->decimal('shipping_fee', 10, 2)->default(0);
+
             $table->string('payment_method');
+            $table->enum('payment_status', [
+                'pending',
+                'processing',
+                'complete'
+            ])->default('pending');
+
+            $table->text('order_notes')->nullable();
+            $table->text('user_note')->nullable();
+
+            $table->integer('notification')->default(1);
+
             $table->timestamps();
+            // $table->softDeletes(); // Uncomment if needed
+
+            $table->index('user_id');
+            $table->index('status');
+            $table->index('payment_status');
         });
     }
 

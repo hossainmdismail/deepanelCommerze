@@ -288,7 +288,7 @@
                 // Grab all selected attributes on the page
                 document.querySelectorAll('.variant-option:checked').forEach(input => {
                     selectedAttributes[input.dataset.attrId] = input.nextSibling.textContent
-                .trim(); // get label text (value)
+                        .trim(); // get label text (value)
                 });
 
 
@@ -302,11 +302,22 @@
                     quantity: quantity,
                     price: price,
                     image: productImage?.src || '{{ asset('storage/' . $product->thumbnail) }}',
-                    attributes: selectedAttributes  // <-- add this
+                    attributes: selectedAttributes // <-- add this
                 };
 
                 Cart.addItem(item);
-                alert('🛒 Product added to cart!');
+                if (window.Notyf) {
+                    const notyf = new Notyf({
+                        duration: 3000,
+                        ripple: true,
+                        position: {
+                            x: 'right',
+                            y: 'top'
+                        }
+                    });
+
+                    notyf.success('🛒 Product added to cart!');
+                }
             });
         }
     </script>

@@ -123,7 +123,7 @@
                                                         placeholder="Address / হাউস নং, রোড নং/গ্রাম" />
                                                 </div>
                                                 <div class="col-12 mb-3">
-                                                    <textarea name="bill" class="form-control" id="bill" placeholder="Note"></textarea>
+                                                    <textarea name="note" class="form-control" id="bill" placeholder="Note"></textarea>
                                                 </div>
                                             </div>
                                         </div>
@@ -146,10 +146,11 @@
                                         <div class="shipping-address-form">
                                             @foreach ($shippings as $key => $shipping)
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="shipping"
-                                                        id="shipping-{{ $key }}" value="{{ $shipping->value }}">
+                                                    <input class="form-check-input" type="radio" name="shipping" data-price="{{ $shipping->value }}"
+                                                        id="shipping-{{ $key }}" value="{{ $shipping->id }}"
+                                                        {{ $key == 0 ? 'checked' : '' }} checked>
                                                     <label class="form-check-label" for="shipping-{{ $key }}">
-                                                        {{ $shipping->name }}
+                                                        {{ $shipping->name }} - {{ $shipping->value }}
                                                     </label>
                                                 </div>
                                             @endforeach
@@ -171,9 +172,33 @@
 
 @section('script')
     <script>
+        window.serverErrors = @json($errors->toArray());
+    </script>
+
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             loadCartPage();
+
+            // Listen to shipping radio change
+            document.querySelectorAll('input[name="shipping"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    const selectedValue = parseFloat(this.dataset.price);
+                    updateShipping(selectedValue);
+                });
+            });
         });
+
+        // Save subtotal globally
+        let globalSubtotal = 0;
+
+        // Recalculate shipping and total
+        function updateShipping(shippingCost) {
+            const shippingElem = document.getElementById('cart-shipping');
+            const totalElem = document.getElementById('cart-total');
+
+            shippingElem.textContent = `৳${shippingCost}`;
+            totalElem.textContent = `৳${globalSubtotal + shippingCost}`;
+        }
 
         function loadCartPage() {
             const cart = Cart.getItems();
@@ -182,11 +207,9 @@
             const shippingElem = document.getElementById('cart-shipping');
             const totalElem = document.getElementById('cart-total');
 
-            tbody.innerHTML = ''; // Clear table
+            tbody.innerHTML = '';
 
             let subtotal = 0;
-            let shipping = 60;
-
             cart.forEach(item => {
                 const row = document.createElement('tr');
                 row.classList.add('table-body-row');
@@ -195,32 +218,59 @@
                 subtotal += total;
 
                 row.innerHTML = `
-                    <td class="product-remove">
-                        <a href="#" onclick="Cart.removeItem(${item.product_id}, ${item.variant_id ?? 'null'}); loadCartPage(); return false;"><i class="far fa-window-close"></i></a>
-                    </td>
-                    <td class="product-image">
-                        <img src="${item.image}" alt="${item.name}" />
-                    </td>
-                    <td class="product-name">
-                        ${item.name}${item.attributes ? '<br><small>' + Object.values(item.attributes).join(', ') + '</small>' : ''}
-                    </td>
-                    <td class="product-price">৳${item.price}</td>
-                    <td class="product-quantity">
-                        <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${item.product_id}, ${item.variant_id ?? 'null'}, this.value)">
-                    </td>
-                    <td class="product-total">৳${total}</td>
-                `;
+            <td class="product-remove">
+                <a href="#" onclick="Cart.removeItem(${item.product_id}, ${item.variant_id ?? 'null'}); loadCartPage(); return false;"><i class="far fa-window-close"></i></a>
+            </td>
+            <td class="product-image">
+                <img src="${item.image}" alt="${item.name}" />
+            </td>
+            <td class="product-name">
+                ${item.name}${item.attributes ? '<br><small>' + Object.values(item.attributes).join(', ') + '</small>' : ''}
+            </td>
+            <td class="product-price">৳${item.price}</td>
+            <td class="product-quantity">
+                <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity(${item.product_id}, ${item.variant_id ?? 'null'}, this.value)">
+            </td>
+            <td class="product-total">৳${total}</td>
+        `;
 
                 tbody.appendChild(row);
             });
 
-            subtotalElem.textContent = `৳${subtotal}`;
-            totalElem.textContent = `৳${subtotal + shipping}`;
+            globalSubtotal = subtotal;
 
-            // ✅ Update the hidden input after cart data is ready
+            subtotalElem.textContent = `৳${subtotal}`;
+
+            // Get selected shipping
+            const selectedShipping = document.querySelector('input[name="shipping"]:checked');
+            const shippingCost = selectedShipping ? parseFloat(selectedShipping.dataset.price) : 60;
+
+            shippingElem.textContent = `৳${shippingCost}`;
+            totalElem.textContent = `৳${subtotal + shippingCost}`;
+
             const hiddenCartInput = document.getElementById('cartData');
             if (hiddenCartInput) {
                 hiddenCartInput.value = JSON.stringify(cart);
+            }
+        }
+
+        if (window.serverErrors) {
+            for (const field in serverErrors) {
+                const messages = serverErrors[field];
+                const input = document.querySelector(`[name="${field}"]`);
+
+                if (input) {
+                    // Add red border
+                    input.classList.add('is-invalid');
+
+                    // Create error element
+                    const errorElem = document.createElement('small');
+                    errorElem.classList.add('text-danger');
+                    errorElem.textContent = messages[0];
+
+                    // Append below input
+                    input.parentNode.appendChild(errorElem);
+                }
             }
         }
 
@@ -231,9 +281,10 @@
             if (index !== -1) {
                 cart[index].quantity = parseInt(quantity);
                 Cart._setCookie('cart', JSON.stringify(cart), 7);
-                loadCartPage();
                 Cart.updateHeaderCount();
             }
+
+            loadCartPage(); // refresh UI and totals
         }
     </script>
 @endsection
