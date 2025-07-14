@@ -24,77 +24,23 @@
                     <div class="product-filters">
                         <ul>
                             <li class="active" data-filter="*">All</li>
-                            <li data-filter=".strawberry">Masalaa</li>
-
-                            <li data-filter=".berry">Honey</li>
-                            <li data-filter=".lemon">Ghee</li>
+                            @foreach ($category as $cat)
+                                <li data-filter=".{{ $cat->slug }}">{{ $cat->name }}</li>
+                            @endforeach
                         </ul>
                     </div>
                 </div>
             </div>
 
             <div class="row product-lists">
-                <!-- হলুদ গুঁড়া - Strawberry -->
-                <div class="col-lg-4 col-md-6 text-center strawberry">
-                    <div class="single-product-item">
-                        <div class="product-image custom-hover-effect">
-                            <a href="single-product02.html?product=Holud">
-                                <img src="{{ asset('themes/ruhama') }}/img/products/khandani01.jpg" alt="Product Image" class="hover-img img-1" />
-                                <img src="{{ asset('themes/ruhama') }}/img/products/khandani02.jpg" alt="Product Image 2"
-                                    class="hover-img img-2" />
-                                <img src="{{ asset('themes/ruhama') }}/img/products/khandani03.jpg" alt="Product Image 3"
-                                    class="hover-img img-3" />
-                            </a>
-                        </div>
-                        <h3 class="font-mukti mt-3">হলুদ গুঁড়া</h3>
-                        <p class="product-price"><span>Per Kg</span> 255 <sup>tk</sup></p>
-                        <a href="cart.html" class="cart-btn">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </a>
-                    </div>
-                </div>
-
-                <!-- জিরার গুড়া - Berry -->
-                <div class="col-lg-4 col-md-6 text-center berry">
-                    <div class="single-product-item">
-                        <div class="product-image custom-hover-effect">
-                            <a href="single-product02.html?product=Ziraa">
-                                <img src="{{ asset('themes/ruhama') }}/img/Ruhamaaa/Ruhamaa 01.jpg" alt="Product Image" class="hover-img img-1" />
-                                <img src="{{ asset('themes/ruhama') }}/img/Ruhamaaa/Ruhamaa 12.jpg" alt="Product Image 2"
-                                    class="hover-img img-2" />
-                                <img src="{{ asset('themes/ruhama') }}/img/ruhama 13.jpg" alt="Product Image 3" class="hover-img img-3" />
-                            </a>
-                        </div>
-                        <h3 class="font-mukti mt-3">জিরার গুড়া</h3>
-                        <p class="product-price"><span>Per Kg</span> 350 <sup>tk</sup></p>
-                        <a href="cart.html" class="cart-btn">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </a>
-                    </div>
-                </div>
-
-                <!-- ধনিয়া গুড়া - Lemon -->
-                <div class="col-lg-4 col-md-6 text-center lemon">
-                    <div class="single-product-item">
-                        <div class="product-image custom-hover-effect">
-                            <a href="single-product02.html?product=Dhoniaa">
-                                <img src="{{ asset('themes/ruhama') }}/img/Ruhamaaa/Ruhamaa 04.jpg" alt="Product Image" class="hover-img img-1" />
-                                <img src="{{ asset('themes/ruhama') }}/img/Ruhamaaa/Ruhamaa 05.jpg" alt="Product Image 2"
-                                    class="hover-img img-2" />
-                                <img src="{{ asset('themes/ruhama') }}/img/Ruhamaaa/Ruhamaa 06.jpg" alt="Product Image 3"
-                                    class="hover-img img-3" />
-                            </a>
-                        </div>
-                        <h3 class="font-mukti mt-3">ধনিয়া গুড়া</h3>
-                        <p class="product-price"><span>Per Kg</span> 450 <sup>tk</sup></p>
-                        <a href="cart.html" class="cart-btn">
-                            <i class="fas fa-shopping-cart"></i> Add to Cart
-                        </a>
-                    </div>
-                </div>
+                {{-- {{ $products->categories }} --}}
+                @forelse ($products as $product)
+                    @include('themes.ruhama.components.product',$product)
+                @empty
+                @endforelse
             </div>
 
-            <div class="row">
+            {{-- <div class="row">
                 <div class="col-lg-12 text-center">
                     <div class="pagination-wrap">
                         <ul>
@@ -106,7 +52,7 @@
                         </ul>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
     <!-- end products -->

@@ -22,21 +22,22 @@ class ProductVariant extends Model
     ];
 
 
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
     // Pivot relation: variant has many attribute values, with attribute_id pivot
-public function attributeValues()
-{
-    return $this->belongsToMany(
-        \App\Models\AttributeValue::class,
-        'product_variant_attribute_values',
-        'product_variant_id',
-        'attribute_value_id'
-    )->withPivot('attribute_id');
-}
+    public function attributeValues()
+    {
+        return $this->belongsToMany(
+            \App\Models\AttributeValue::class,
+            'product_variant_attribute_values',
+            'product_variant_id',
+            'attribute_value_id'
+        )->withPivot('attribute_id');
+    }
 
 
 

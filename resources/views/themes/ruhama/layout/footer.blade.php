@@ -28,8 +28,8 @@
                         <ul>
                             <li><a href="{{ route('home') }}">Home</a></li>
                             <li><a href="{{ route('about') }}">About</a></li>
-                            <li><a href="services.html">Shop</a></li>
-                            <li><a href="news.html">News</a></li>
+                            <li><a href="{{ route('shop') }}">Shop</a></li>
+                            {{-- <li><a href="news.html">News</a></li> --}}
                             <li><a href="{{ route('contact') }}">Contact</a></li>
                         </ul>
                     </div>

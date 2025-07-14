@@ -10,10 +10,18 @@ class Order extends Model
 {
     protected $fillable = [
         'user_id',
+        'customer_id',
         'status',
         'total_amount',
-        'shipping_address',
-        'payment_method'
+        'shipping_method',
+        'shipping_fee',
+        'payment_method',
+        'payment_status',
+        'order_notes',
+        'user_note',
+        'notification',
+        'coupon_code',
+        'discount_amount',
     ];
 
     protected $casts = [
@@ -25,8 +33,13 @@ class Order extends Model
         return $this->belongsTo(Customer::class, 'customer_id');
     }
 
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
     public function items(): HasMany
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(OrderItem::class, 'order_id');
     }
 }

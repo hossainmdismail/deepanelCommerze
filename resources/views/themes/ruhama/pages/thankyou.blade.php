@@ -111,4 +111,18 @@
             }
         });
     </script>
+
+    <script>
+        const purchaseItems = @json($order->items);
+        const totalValue = {{ $order->total_amount + $order->shipping_fee }};
+
+        if (typeof fbq !== 'undefined') {
+            fbq('track', 'Purchase', {
+                content_ids: purchaseItems.map(item => item.product_id),
+                content_type: 'product',
+                value: totalValue,
+                currency: 'BDT'
+            });
+        }
+    </script>
 @endsection

@@ -1,4 +1,11 @@
-<div class="col-lg-4 col-md-6 text-center">
+@php
+    $categoryClasses = '';
+    if (!empty($product['categories'])) {
+        $categoryClasses = implode(' ', $product['categories']);
+    }
+@endphp
+
+<div class="col-lg-4 col-md-6 text-center {{ $categoryClasses }}">
     <div class="single-product-item fruite-item">
         <div class="product-image fruite-img">
             <a href="{{ route('product.show', $product['slug']) }}">
@@ -15,16 +22,16 @@
         @else
             <p class="product-price">
                 ৳{{ number_format($product['price']) }}
-                @if($product['price'] !== $product['max_price'])
-                    - ৳{{ number_format($product['max_price']) }}
-                @endif
+                @if ($product['price'] !== $product['max_price'])
+                    - ৳{{ number_format($product['max_price']) }} @endif
                 <sup>tk</sup>
                 <span>Short Description</span>
             </p>
         @endif
 
-        <a href="#" class="cart-btn">
-            <i class="fas fa-shopping-cart"></i> Add to Cart
-        </a>
-    </div>
+        <a href="{{ route('product.show', $product['slug']) }}"
+    class="cart-btn">
+    <i class="fas fa-shopping-cart"></i> Order Now
+    </a>
+</div>
 </div>

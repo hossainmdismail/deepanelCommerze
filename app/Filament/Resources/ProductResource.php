@@ -90,61 +90,38 @@ class ProductResource extends Resource
                                         TextInput::make('price')->numeric()->required(),
                                         TextInput::make('stock')->numeric()->required(),
                                         FileUpload::make('image')->image()->directory('products/variants'),
-
-                                        // Repeater::make('attributes')
-                                        //     ->label('Attributes')
-                                        //     ->statePath('attribute_snapshot') // 👈 this is the magic
-                                        //     ->default([])
-                                        //     ->schema([
-                                        //         Select::make('attribute_id')
-                                        //             ->label('Attribute')
-                                        //             ->options(fn() => \App\Models\Attribute::pluck('name', 'id'))
-                                        //             ->required()
-                                        //             ->reactive()
-                                        //             ->afterStateUpdated(fn($state, Forms\Set $set) => $set('attribute_value_id', null)),
-
-                                        //         Select::make('attribute_value_id')
-                                        //             ->label('Value')
-                                        //             ->options(
-                                        //                 fn(Forms\Get $get) =>
-                                        //                 \App\Models\AttributeValue::where('attribute_id', $get('attribute_id'))
-                                        //                     ->pluck('value', 'id')
-                                        //             )
-                                        //             ->required(),
-                                        //     ])
-                                        //     ->columns(2)
                                         Repeater::make('attributes')
-    ->label('Attributes')
-    ->statePath('attribute_snapshot')
-    ->default([])
-    ->schema([
-        Select::make('attribute_id')
-            ->label('Attribute')
-            ->options(fn() => \App\Models\Attribute::pluck('name', 'id'))
-            ->required()
-            ->reactive()
-            ->afterStateUpdated(fn($state, Forms\Set $set) => $set('attribute_value_id', null)),
+                                            ->label('Attributes')
+                                            ->statePath('attribute_snapshot')
+                                            ->default([])
+                                            ->schema([
+                                                Select::make('attribute_id')
+                                                    ->label('Attribute')
+                                                    ->options(fn() => \App\Models\Attribute::pluck('name', 'id'))
+                                                    ->required()
+                                                    ->reactive()
+                                                    ->afterStateUpdated(fn($state, Forms\Set $set) => $set('attribute_value_id', null)),
 
-        Select::make('attribute_value_id')
-            ->label('Value')
-            ->options(
-                fn(Forms\Get $get) =>
-                \App\Models\AttributeValue::where('attribute_id', $get('attribute_id'))
-                    ->pluck('value', 'id')
-            )
-            ->required(),
-    ])
-    ->columns(2)
-    ->rules([
-        function () {
-            return function (string $attribute, $value, \Closure $fail) {
-                $attributeIds = collect($value)->pluck('attribute_id');
-                if ($attributeIds->count() !== $attributeIds->unique()->count()) {
-                    $fail('You cannot use the same attribute multiple times in a single variant.');
-                }
-            };
-        }
-    ])
+                                                Select::make('attribute_value_id')
+                                                    ->label('Value')
+                                                    ->options(
+                                                        fn(Forms\Get $get) =>
+                                                        \App\Models\AttributeValue::where('attribute_id', $get('attribute_id'))
+                                                            ->pluck('value', 'id')
+                                                    )
+                                                    ->required(),
+                                            ])
+                                            ->columns(2)
+                                            ->rules([
+                                                function () {
+                                                    return function (string $attribute, $value, \Closure $fail) {
+                                                        $attributeIds = collect($value)->pluck('attribute_id');
+                                                        if ($attributeIds->count() !== $attributeIds->unique()->count()) {
+                                                            $fail('You cannot use the same attribute multiple times in a single variant.');
+                                                        }
+                                                    };
+                                                }
+                                            ])
 
 
                                     ])

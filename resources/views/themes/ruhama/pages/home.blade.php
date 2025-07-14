@@ -85,14 +85,9 @@
                 @forelse ($products as $product)
                     @include('themes.ruhama.components.product',$product)
                 @empty
-
                 @endforelse
             </div>
         </div>
-
-
-        <!-- Best Selling Item Ending Button For All Products -->
-
 
         <div class="text-center mt-5 font-mukti">
             <a href="{{ route('shop') }}" class="btn btn-primary"
@@ -119,7 +114,7 @@
     <!-- Add JavaScript -->
 
     <!-- cart banner section -->
-    <section class="cart-banner pt-100 pb-100">
+    {{-- <section class="cart-banner pt-100 pb-100">
         <div class="container">
             <div class="row clearfix">
                 <!--Image Column-->
@@ -169,7 +164,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
     <!-- end cart banner section -->
 
 
@@ -254,7 +249,7 @@
     <!-- end shop banner -->
 
     <!-- latest news -->
-    <div class="latest-news pt-150 pb-150">
+    {{-- <div class="latest-news pt-150 pb-150">
         <div class="container font-mukti">
             <div class="row">
                 <div class="col-lg-8 offset-lg-2 text-center">
@@ -351,7 +346,7 @@
 
 
         </div>
-    </div>
+    </div> --}}
     <!-- end latest news -->
 
 

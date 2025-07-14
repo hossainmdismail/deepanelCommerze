@@ -21,6 +21,7 @@ class OrderController extends Controller
             'address' => 'required|string',
             'shipping' => 'required|numeric',
             'cart_data' => 'required|json',
+            'cart_data' => 'required|json',
         ], [
             'name.required'     => 'নাম অবশ্যই প্রদান করতে হবে।',
             'name.string'       => 'নাম অবশ্যই একটি স্ট্রিং হতে হবে।',
@@ -29,6 +30,7 @@ class OrderController extends Controller
             'number.regex'      => 'আপনার নাম্বার টি সঠিক হয়নি দয়া করে ১১টি ডিজিট দিন | 0191-2096479',
             'shipping.required' => 'শিপিং এর জন্য অবশ্যই একটি অপশন নির্বাচন করতে হবে।',
             'address.required'  => 'ঠিকানা অবশ্যই প্রদান করতে হবে।',
+            'cart_data'         => 'কার্ট খালি অথবা সঠিক নয়!'
         ]);
 
         try {
@@ -60,12 +62,10 @@ class OrderController extends Controller
 
             // Decode cart data
             $cartData = json_decode($request->cart_data, true);
-
-            if (!is_array($cartData)) {
-                return back()->with('err', 'Invalid cart data.');
+            if (!is_array($cartData) || empty($cartData)) {
+                return back()->with(['err', 'কার্ট খালি অথবা সঠিক নয়!']);
             }
 
-            // 1. Calculate subtotal
             $subtotal = 0;
             foreach ($cartData as $item) {
                 $subtotal += $item['price'] * $item['quantity'];

@@ -17,24 +17,15 @@
                         <nav class="main-menu">
                             <ul>
                                 <li class="current-list-item">
-                                    <a href="#">Home</a>
-                                    <ul class="sub-menu">
-                                        <li><a href="{{ route('home') }}">Static Home</a></li>
-                                        <li><a href="index_2.html">Slider Home</a></li>
-                                    </ul>
+                                    <a href="{{ route('home') }}">Home</a>
                                 </li>
 
                                 <li>
                                     <a href="{{ route('shop') }}">Shop</a>
-                                    <ul class="sub-menu">
-                                        <li><a href="{{ route('shop') }}">Shop</a></li>
-                                        <li><a href="single-product.html">Single Product</a></li>
-                                        <li><a href="cart.html">Cart</a></li>
-                                    </ul>
                                 </li>
 
                                 <li><a href="{{ route('about') }}">About</a></li>
-                                <li>
+                                {{-- <li>
                                     <a href="#">Pages</a>
                                     <ul class="sub-menu">
                                         <li><a href="cart.html">Cart</a></li>
@@ -42,7 +33,7 @@
                                         <li><a href="{{ route('contact') }}">Contact</a></li>
                                         <li><a href="404.html">404 page</a></li>
                                     </ul>
-                                </li>
+                                </li> --}}
 
                                 <li><a href="{{ route('contact') }}">Contact</a></li>
 

@@ -71,8 +71,36 @@ class ProductFrontController extends Controller
             ];
         })->toArray();
 
+        $products = Product::with(['variants'])->with('categories')->where('status', 'published')->get();
+
+        $products = Product::with('variants')
+            ->where('status', 'published')
+            ->get()
+            ->take(20)
+            ->map(function ($product) {
+                $price = $product->is_variant_based
+                    ? optional($product->variants->sortBy('price')->first())->price
+                    : $product->base_price;
+
+                $maxPrice = $product->is_variant_based
+                    ? optional($product->variants->sortByDesc('price')->first())->price
+                    : null;
+
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'thumbnail' => $product->thumbnail,
+                    'price' => $price,
+                    'max_price' => $maxPrice,
+                    'is_variant_based' => $product->is_variant_based,
+                    'categories' => $product->categories->pluck('slug')->toArray()
+                ];
+            });
+
         return view('themes.ruhama.pages.product', [
-            'product' => $product,
+            'productView' => $product,
+            'products' => $products,
             'minPrice' => $minPrice,
             'maxPrice' => $maxPrice,
             'attributes' => $formattedAttributes,
@@ -85,6 +113,7 @@ class ProductFrontController extends Controller
     }
 
     public function cartShow(){
+
         $shippings = Shipping::where('status','active')->get();
 
         return view('themes.ruhama.pages.cart',['shippings' =>$shippings]);

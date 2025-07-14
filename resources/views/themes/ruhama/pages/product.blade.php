@@ -67,7 +67,7 @@
                 <!-- Product Image -->
                 <div class="col-md-5">
                     <div class="single-product-img">
-                        <img src="{{ asset('storage/' . $product->thumbnail) }}" alt="{{ $product->name }}"
+                        <img src="{{ asset('storage/' . $productView->thumbnail) }}" alt="{{ $productView->name }}"
                             class="img-fluid" id="productImage" />
                     </div>
                 </div>
@@ -75,24 +75,24 @@
                 <!-- Product Content -->
                 <div class="col-md-7">
                     <div class="single-product-content">
-                        <h3>{{ $product->name }}</h3>
+                        <h3>{{ $productView->name }}</h3>
 
                         <!-- Dynamic Price -->
                         <p class="single-product-pricing" id="productPrice">
-                            @if ($product->is_variant_based)
+                            @if ($productView->is_variant_based)
                                 From {{ $minPrice }} <sup>৳</sup>
                             @else
-                                {{ $product->base_price }} <sup>৳</sup>
+                                {{ $productView->base_price }} <sup>৳</sup>
                             @endif
                         </p>
 
-                        <p>{{ $product->description }}</p>
+                        <p>{{ $productView->description }}</p>
 
                         <!-- Add to Cart Form -->
                         <div class="single-product-form">
                             <form method="POST" action="{{ route('add.to.cart') }}">
                                 @csrf
-                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <input type="hidden" name="product_id" value="{{ $productView->id }}">
                                 <input type="hidden" name="product_variant_id" id="selectedVariantId">
 
                                 <!-- Attribute Options -->
@@ -116,18 +116,13 @@
                                 <input type="number" name="quantity" class="form-control mb-3" style="width: 100px"
                                     min="1" value="1" required>
 
-                                <!-- Submit Button -->
-                                {{-- <button type="submit" class="cart-btn OrderNowButtonColor">
-                                    <i class="fas fa-shopping-cart"></i> Order Now
-                                </button> --}}
-                                <!-- Submit Buttons -->
                                 <div class="d-flex gap-2">
-                                    <button type="button" id="addToCartBtn" class="cart-btn btn btn-outline-primary mr-2">
+                                    <button type="button" id="addToCartBtn" class="cart-btn OrderNowButtonColor mr-2">
 
                                         <i class="fas fa-plus"></i> Add to Cart
                                     </button>
 
-                                    <button type="submit" class="cart-btn OrderNowButtonColor">
+                                    <button type="button" id="orderNowBtn" class="cart-btn OrderNowButtonColor">
                                         <i class="fas fa-shopping-cart"></i> Order Now
                                     </button>
                                 </div>
@@ -135,7 +130,7 @@
 
                                 <p class="mt-2">
                                     <strong>Categories:</strong>
-                                    {{ $product->categories->pluck('name')->implode(', ') }}
+                                    {{ $productView->categories->pluck('name')->implode(', ') }}
                                 </p>
                             </form>
                         </div>
@@ -170,39 +165,10 @@
             </div>
 
             <div class="row">
-                <div class="col-lg-4 col-md-6 text-center">
-                    <div class="single-product-item">
-                        <div class="product-image">
-                            <a href="single-product.html"><img src="assets/img/products/product-img-1.jpg"
-                                    alt="" /></a>
-                        </div>
-                        <h3>Strawberry</h3>
-                        <p class="product-price"><span>Per Kg</span> 85$</p>
-                        <a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 text-center">
-                    <div class="single-product-item">
-                        <div class="product-image">
-                            <a href="single-product.html"><img src="assets/img/products/product-img-2.jpg"
-                                    alt="" /></a>
-                        </div>
-                        <h3>Berry</h3>
-                        <p class="product-price"><span>Per Kg</span> 70$</p>
-                        <a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 offset-lg-0 offset-md-3 text-center">
-                    <div class="single-product-item">
-                        <div class="product-image">
-                            <a href="single-product.html"><img src="assets/img/products/product-img-3.jpg"
-                                    alt="" /></a>
-                        </div>
-                        <h3>Lemon</h3>
-                        <p class="product-price"><span>Per Kg</span> 35$</p>
-                        <a href="cart.html" class="cart-btn"><i class="fas fa-shopping-cart"></i> Add to Cart</a>
-                    </div>
-                </div>
+                @forelse ($products as $product)
+                    @include('themes.ruhama.components.product',$product)
+                @empty
+                @endforelse
             </div>
         </div>
     </div>
@@ -211,9 +177,18 @@
 
 @section('script')
     <script>
+        fbq('track', 'ViewContent', {
+            content_ids: ['{{ $productView->id }}'],
+            content_type: 'product',
+            value: {{ $productView->is_variant_based ? $minPrice : $productView->base_price }},
+            currency: 'BDT'
+        });
+
+
+
         const variants = @json($variants ?? []);
-        const isVariantBased = {{ $product->is_variant_based ? 'true' : 'false' }};
-        const product = @json($product);
+        const isVariantBased = {{ $productView->is_variant_based ? 'true' : 'false' }};
+        const product = @json($productView);
 
         // DOM elements
         const variantOptions = document.querySelectorAll('.variant-option');
@@ -222,6 +197,14 @@
         const productImage = document.getElementById('productImage');
         const addToCartBtn = document.getElementById('addToCartBtn');
         const quantityInput = document.querySelector('input[name="quantity"]');
+        const notyf = new Notyf({
+            duration: 4000,
+            ripple: true,
+            position: {
+                x: 'right',
+                y: 'top'
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             updateVariant();
@@ -268,7 +251,7 @@
             } else {
                 productPrice.innerHTML = 'Select options to see price';
                 selectedVariantIdInput.value = '';
-                productImage.src = '{{ asset('storage/' . $product->thumbnail) }}';
+                productImage.src = '{{ asset('storage/' . $productView->thumbnail) }}';
             }
         }
 
@@ -281,7 +264,7 @@
                 const selectedAttributes = {};
 
                 if (!quantity || (isVariantBased && !variantId)) {
-                    alert('Please select all options and quantity');
+                    notyf.error('Please select all options and quantity');
                     return;
                 }
 
@@ -301,11 +284,24 @@
                     name: product.name,
                     quantity: quantity,
                     price: price,
-                    image: productImage?.src || '{{ asset('storage/' . $product->thumbnail) }}',
+                    image: productImage?.src || '{{ asset('storage/' . $productView->thumbnail) }}',
                     attributes: selectedAttributes // <-- add this
                 };
 
                 Cart.addItem(item);
+                if (typeof fbq !== 'undefined') {
+                    fbq('track', 'AddToCart', {
+                        content_ids: [item.product_id],
+                        content_type: 'product',
+                        value: item.price,
+                        currency: 'BDT',
+                        contents: [{
+                            id: item.product_id,
+                            quantity: item.quantity,
+                            item_price: item.price
+                        }]
+                    });
+                }
                 if (window.Notyf) {
                     const notyf = new Notyf({
                         duration: 3000,
@@ -321,110 +317,73 @@
             });
         }
     </script>
-@endsection
-
-
-{{-- @section('script')
     <script>
-        const variants = @json($variants);
-        const variantOptions = document.querySelectorAll('.variant-option');
-        const productPrice = document.getElementById('productPrice');
-        const selectedVariantIdInput = document.getElementById('selectedVariantId');
-        const productImage = document.getElementById('productImage');
+        const orderNowBtn = document.getElementById('orderNowBtn');
 
-        function findMatchingVariant(selectedAttrs) {
-            return variants.find(variant => {
-                if (variant.attributes.length !== Object.keys(selectedAttrs).length) return false;
-                return variant.attributes.every(attr =>
-                    selectedAttrs[attr.attribute_id] == attr.attribute_value_id
-                );
-            });
-        }
+        if (orderNowBtn) {
+            orderNowBtn.addEventListener('click', function(e) {
+                e.preventDefault();
 
-        function updateVariant() {
-            const selectedAttrs = {};
-            variantOptions.forEach(input => {
-                // Remove highlight from all radios first
-                input.closest('label.btn').classList.remove('selected');
+                const quantity = parseInt(quantityInput.value);
+                const variantId = selectedVariantIdInput.value || null;
+                const selectedAttributes = {};
 
-                if (input.checked) {
-                    selectedAttrs[input.dataset.attrId] = parseInt(input.value);
-                    // Add highlight to checked one
-                    input.closest('label.btn').classList.add('selected');
+                if (!quantity || (isVariantBased && !variantId)) {
+                    notyf.error('Please select all options and quantity');
+                    return;
                 }
-            });
 
-            const matchedVariant = findMatchingVariant(selectedAttrs);
+                document.querySelectorAll('.variant-option:checked').forEach(input => {
+                    selectedAttributes[input.dataset.attrId] = input.nextSibling.textContent.trim();
+                });
 
-            if (matchedVariant) {
-                productPrice.innerHTML = matchedVariant.price + ' <sup>৳</sup>';
-                selectedVariantIdInput.value = matchedVariant.id;
-                if (matchedVariant.image) {
-                    productImage.src = '{{ asset('storage') }}/' + matchedVariant.image;
-                }
-            } else {
-                productPrice.innerHTML = 'Select options to see price';
-                selectedVariantIdInput.value = '';
-                productImage.src = '{{ asset('storage') }}/' + '{{ $product->thumbnail }}';
-            }
-        }
+                const priceText = productPrice.textContent;
+                const price = parseFloat(priceText.replace(/[^\d.]/g, ''));
 
-
-        variantOptions.forEach(input => {
-            input.addEventListener('change', updateVariant);
-        });
-
-        // Initialize variant price/image if only one variant or pre-selected
-        document.addEventListener('DOMContentLoaded', () => {
-            updateVariant();
-        });
-    </script>
-    <script>
-        document.getElementById('addToCartBtn').addEventListener('click', function() {
-            const productId = document.querySelector('input[name="product_id"]').value;
-            const variantId = document.getElementById('selectedVariantId').value || null;
-            const quantity = parseInt(document.querySelector('input[name="quantity"]').value);
-            const productName = @json($product->name);
-            const image = document.getElementById('productImage')?.src ||
-                '{{ asset('storage/' . $product->thumbnail) }}';
-            const priceText = document.getElementById('productPrice').textContent;
-            const price = parseFloat(priceText.replace(/[^\d.]/g, ''));
-
-            if (!price || !quantity) return alert('Please select a variant and quantity');
-
-            let cart = JSON.parse(getCookie('cart') || '[]');
-
-            const existingIndex = cart.findIndex(item =>
-                item.product_id == productId && item.variant_id == variantId
-            );
-
-            if (existingIndex !== -1) {
-                cart[existingIndex].quantity += quantity;
-            } else {
-                cart.push({
-                    product_id: productId,
+                const item = {
+                    product_id: product.id,
                     variant_id: variantId,
-                    name: productName,
+                    name: product.name,
                     quantity: quantity,
                     price: price,
-                    image: image
-                });
-            }
+                    image: productImage?.src || '{{ asset('storage/' . $productView->thumbnail) }}',
+                    attributes: selectedAttributes
+                };
 
-            setCookie('cart', JSON.stringify(cart), 7);
-            alert('Added to cart!');
-        });
+                // Add item to cart
+                Cart.addItem(item);
+                if (typeof fbq !== 'undefined') {
+                    fbq('track', 'AddToCart', {
+                        content_ids: [item.product_id],
+                        content_type: 'product',
+                        value: item.price,
+                        currency: 'BDT',
+                        contents: [{
+                            id: item.product_id,
+                            quantity: item.quantity,
+                            item_price: item.price
+                        }]
+                    });
+                }
 
-        function setCookie(name, value, days) {
-            const expires = new Date(Date.now() + days * 864e5).toUTCString();
-            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
-        }
+                // Optional: Show notification
+                if (window.Notyf) {
+                    const notyf = new Notyf({
+                        duration: 1000,
+                        ripple: true,
+                        position: {
+                            x: 'right',
+                            y: 'top'
+                        }
+                    });
+                    notyf.success('✅ Product added, redirecting...');
+                }
 
-        function getCookie(name) {
-            return document.cookie.split('; ').reduce((acc, cookie) => {
-                const [key, val] = cookie.split('=');
-                return key === name ? decodeURIComponent(val) : acc;
-            }, '');
+                // Redirect after slight delay
+                setTimeout(() => {
+                    window.location.href = "{{ route('cart.show') }}"; // 👈 change route name if needed
+                }, 1000);
+            });
         }
     </script>
-@endsection --}}
+@endsection

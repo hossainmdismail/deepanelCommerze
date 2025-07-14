@@ -287,4 +287,45 @@
             loadCartPage(); // refresh UI and totals
         }
     </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const cartCookie = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('cart='));
+
+        if (!cartCookie) {
+            // No cart cookie at all
+            window.location.href = "{{ route('home') }}";
+            return;
+        }
+
+        const cartData = decodeURIComponent(cartCookie.split('=')[1]);
+        try {
+            const cartItems = JSON.parse(cartData);
+            if (!Array.isArray(cartItems) || cartItems.length === 0) {
+                window.location.href = "{{ route('home') }}";
+            }
+        } catch (e) {
+            // Invalid JSON
+            window.location.href = "{{ route('home') }}";
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Wait for the cart to be loaded
+        const cartItems = Cart.getItems();
+
+        if (typeof fbq !== 'undefined' && cartItems.length > 0) {
+            fbq('track', 'InitiateCheckout', {
+                content_ids: cartItems.map(item => item.product_id),
+                content_type: 'product',
+                value: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+                currency: 'BDT',
+                num_items: cartItems.length
+            });
+        }
+    });
+</script>
+
 @endsection
