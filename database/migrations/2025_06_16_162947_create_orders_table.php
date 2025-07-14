@@ -14,9 +14,11 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('order_id');
-            $table->foreignId('customer_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('order_id')->unique();
+            // $table->foreignId('customer_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('customer_id')->nullable();
+            // $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->nullable();
             $table->enum('status', [
                 'pending',
                 'processing',
