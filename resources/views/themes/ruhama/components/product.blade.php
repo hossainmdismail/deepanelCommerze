@@ -16,7 +16,7 @@
 
         @if (!$product['is_variant_based'])
             <p class="product-price">
-                ৳{{ number_format($product['price']) }} <sup>tk</sup>
+                ৳{{ number_format($product['price']) }}
                 <span>Short Description</span>
             </p>
         @else
@@ -24,7 +24,6 @@
                 ৳{{ number_format($product['price']) }}
                 @if ($product['price'] !== $product['max_price'])
                     - ৳{{ number_format($product['max_price']) }} @endif
-                <sup>tk</sup>
                 <span>Short Description</span>
             </p>
         @endif
